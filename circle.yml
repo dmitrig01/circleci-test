@@ -1,0 +1,11 @@
+---
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker pull paintedfox/postgresql
+  post:
+    - docker run -d --name="postgresql" -p 127.0.0.1::5432 -e USER="root" -e DB="test" -e PASS="root" paintedfox/postgresql
+    - PGPASSWORD=root psql -U root -p `docker port postgresql 5432 | python -c "import sys;[sys.stdout.write(line.split(\":\")[1]) for line in sys.stdin]"` -h localhost test < schema.sql
